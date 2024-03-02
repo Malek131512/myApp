@@ -1,0 +1,284 @@
+body {
+    color: black;
+    display: block;
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul {
+    display: none;
+}
+#dropDownMenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out; /* Ajustez comme nécessaire */
+}
+
+#dropDownMenu.open {
+    max-height: 1000px; /* Ajustez à la hauteur maximale de votre menu déroulant */
+}
+
+.menu-icon:hover + nav ul {
+    display: block;
+}
+header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #00000038;
+    z-index: 999;
+}
+
+
+.navbar {
+    font-size: 18px;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 10px;
+}
+
+.toggle {
+    width: 80px;
+}
+
+.main-nav {
+    list-style-type: none;
+    display: none;
+}
+
+.nav-links,
+.logo {
+    text-decoration: none;
+    color: black;
+
+}
+
+.main-nav li {
+    text-align: center;
+    margin: 15px auto;
+}
+
+.logo {
+    display: inline-block;
+    font-size: 22px;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.navbar-toggle {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    color: black;
+    font-size: 24px;
+}
+
+.active {
+    display: block;
+}
+
+@media screen and (min-width: 768px) {
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 0;
+        height: 70px;
+        align-items: center;
+    }
+
+    .main-nav {
+        display: flex;
+        margin-right: 30px;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .main-nav li {
+        margin: 0;
+    }
+
+    .nav-links {
+        margin-left: 40px;
+    }
+
+    .logo {
+        margin-top: 0;
+    }
+
+    .navbar-toggle {
+        display: none;
+    }
+
+    .logo:hover,
+    .nav-links:hover {
+        color: black;
+    }
+}
+
+
+.jumbotron {
+
+    background-color: #FFFFFF;
+
+}
+
+.custom-button2 {
+    border-radius: 15px;
+    background-color: rgb(0 0 0 / 0%);
+    border: 0px;
+    box-shadow: 0px 0px 13px 2px rgb(0 0 0 / 37%);
+}
+.custom-button {
+     box-shadow: 0px 0px 13px 10px rgb(0 0 0 / 20%);
+    background-color: #3a3939;
+    color: white;
+    border: 0px;
+    border-radius: 30px;
+    height: 50px;
+    width: 15rem;
+    margin: 15px;
+    font-size: 20px;
+    text-align: -webkit-center;
+    padding-top: 5px;
+ }
+input[type="text"],[type="button"]{
+    box-shadow: 0px 0px 21px 1px rgb(0 0 0 / 0%);
+}
+.custom-button:hover {
+    box-shadow: 0px 0px 13px 10px rgb(0 0 0 / 20%);
+    background-color: white;
+    color: black;
+    border-color: black;
+    border-radius: 30px;
+}
+
+#BipForme {
+    margin-right: 3px;
+    margin-left: 3px;
+    margin-top: 3px;
+    width: 50px;
+    height: 50px;
+    background: rgb(51, 51, 51);
+    border-radius: 30px;
+
+}
+
+#BipWhiteButtonFicheActive {
+    position: absolute;
+    margin-left: 11px;
+    z-index: 10;
+    margin-top: 15px;
+    width: 34px;
+    height: 21px;
+}
+.jumbotron{
+    margin-top: 50px;
+    box-shadow: 0px 0px 13px 10px rgb(0 0 0 / 10%);
+    background-color: #ffffffb0;
+    border-radius: 1.3rem;
+    margin-bottom: 39rem;
+    width: 20rem;
+}
+
+
+#divContourBip {
+    z-index: 10;
+    margin-right: auto;
+    margin-left: auto;
+    border: 2px solid rgb(51, 51, 51);
+    width: 60px;
+    height: 30px;
+    margin-top: -30px;
+    background: white;
+    border-bottom: white;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    box-shadow: 0px 0px 13px 2px rgb(0 0 0 / 37%);
+}
+.photo_profil {
+}
+
+
+.photo_profil + label {
+    border-radius: 70px;
+    height: 120px;
+    width: 120px;
+    font-size: 1.25em;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0px 0px 13px 2px rgb(0 0 0 / 37%);
+
+    display: inline-block;
+}
+.photo_profil + label {
+    border-radius: 70px;
+    cursor: pointer; /* "hand" cursor */
+}
+.photo_profil:focus + label,
+.photo_profil + label:hover {
+}
+
+.shadow{
+    box-shadow: 0px 0px 13px 2px rgb(0 0 0 / 37%);
+}
+@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@500&display=swap');
+
+
+html {
+    color: black;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+  color: black;
+    height: 100%;
+    position: fixed;
+}
+
+.container {
+    margin: auto;
+    max-width: 768px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+}
+
+.toggle, .dropdown-menu {
+    width: 100%;
+}
+
+.is-active .dropdown-menu {
+    display: block;
+}
+
+
+
+.dropdown {
+    box-shadow: inset 0 0 10px #00000020;   position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+}
+
+.toggle-navbar, .dropdown-menu {
+    width: 100%;
+}
+
+.is-active .dropdown-menu {
+    display: block;
+}

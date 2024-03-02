@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+          content="Connectez-vous à votre espace Bip, gérez et personnalisez votre profil pour un networking plus efficace.">
+    <title>Application Bip</title>
+    <script>
+        // Définition des ressources externes
+        const cssLinks = [
+            "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css",
+            "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css",
+            ["https://use.fontawesome.com/releases/v5.6.1/css/all.css", "sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"],
+            "https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css",
+            "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css",
+            ["https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css","sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"],
+            "node_modules/quill/dist/quill.snow.css",//"https://cdn.quilljs.com/1.3.6/quill.snow.css",
+            "css/Commun.css",
+            "css/footer.css",
+            "css/LoginStyle.css",
+            "css/HeaderStyle.css",
+            "css/modal.css",
+            "css/tableau-de-bord.css",
+           // "css/index.css",
+        ];
+        cssLinks.forEach(link => {
+            const linkElement = document.createElement('link');
+            linkElement.rel = 'stylesheet';
+            if (Array.isArray(link)) {
+                linkElement.href = link[0];
+                linkElement.integrity = link[1];
+                linkElement.crossOrigin = 'anonymous';
+            } else {
+                linkElement.href = link;
+            }
+
+            document.head.appendChild(linkElement);
+        }); // Ajouter les liens CSS au <head>
+
+        const jsScripts = [
+            ["https://code.jquery.com/jquery-3.4.1.min.js", "sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="],
+            "https://code.jquery.com/ui/1.12.1/jquery-ui.js",
+            "https://kit.fontawesome.com/7aaa921778.js",
+            "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js",
+            ["https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js", "sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"],
+            "https://rawgit.com/RubaXa/Sortable/master/Sortable.js",
+            "https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.16.0/codemirror.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.16.0/mode/htmlmixed/htmlmixed.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.16.0/mode/javascript/javascript.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.16.0/mode/xml/xml.js",
+            "https://code.highcharts.com/highcharts.js",
+            "https://code.highcharts.com/modules/series-label.js",
+            "https://code.highcharts.com/modules/exporting.js",
+            "https://code.highcharts.com/modules/export-data.js",
+            "https://code.highcharts.com/modules/accessibility.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js",
+            "node_modules/quill/dist/quill.js",//"https://cdn.quilljs.com/1.3.6/quill.js",
+            "https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/es5/draggable.bundle.legacy.js",
+            "https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js",
+        ];
+
+        const mapJsScripts = [
+            true,
+            true,
+            true,
+            true,
+            true,
+            'links',
+            true,
+            'home',
+            'home',
+            'home',
+            'home',
+            'home',
+            'home',
+            'home',
+            'home',
+            'home',
+            'profil',
+            'profil',
+            'links',
+            'qrcode',
+        ];
+
+
+        jsScripts.forEach((script,index) => {
+            const currentRouteId = localStorage.getItem('currentRouteId'); // Récupère l'ID de l'itinéraire courant
+            const shouldLoadScript = mapJsScripts[index] === true || mapJsScripts[index] === currentRouteId;
+            if (shouldLoadScript &&  !document.querySelector(`script[src="${script}"]`)) { // Vérifie si le script est déjà chargé
+                const scriptElement = document.createElement('script');
+                if (Array.isArray(script)) {
+                    scriptElement.src = script[0];
+                    scriptElement.integrity = script[1];
+                    scriptElement.crossOrigin = 'anonymous';
+                } else {
+                    scriptElement.src = script;
+                }
+                //  scriptElement.async = false; // Charger de manière synchrone, si nécessaire
+                document.head.appendChild(scriptElement);
+            }
+        }); // Ajouter les scripts JS à la fin du <body>
+
+        // Conditions basées sur l'état de connexion utilisateur (exemple)
+        if (localStorage.getItem('isUserLoggedIn') === 'true') {
+            const loggedInResources = [ // Ajouter des ressources spécifiques à l'utilisateur connecté
+                "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css",
+                "https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+            ];
+            loggedInResources.forEach(resource => {
+                const linkElement = document.createElement('link');
+                linkElement.rel = 'stylesheet';
+                linkElement.href = resource;
+                document.head.appendChild(linkElement);
+            });
+        }
+    </script>
+    <style>
+        .underline-on-hover:hover {
+            text-decoration: underline;
+        }
+
+        .modal-backdrop {
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body id="body">
+<div class="wrapper" style="display: flex; justify-content: center; align-items: center; height: 100vh;z-index:10000;">
+    <div class="wrapper"
+         style="display: flex; justify-content: center; align-items: center; height: 100vh;z-index:10000;">
+        <div class="cssload-loader">
+            <img class="loadImg"
+                 style="position:absolute;z-index: 10; left: 54%; top: 50%; transform: translate(-50%, -50%); width: 45px; height: 26px;"
+                 src="/img/bip_white.png">
+        </div>
+    </div>
+</div>
+</br></br></br>
+
+<header style="background: white;">
+    <div class="text-center">
+        <div class="dropdown row">
+            <div class="col-2" style="margin: 0px;">
+                <a href="#" id="navBarBtn" title="" class="btn toggle-navbar">
+                    <i style="font-size:30px;    margin-top: 10px;" class="fas fa-bars"></i>
+                </a>
+            </div>
+            <div class="col-8" style="  margin: 0px;margin-top: 10px;margin-bottom: 10px;">
+                <a href="">
+                    <img style="height: 40px;" src="/img/logo.png"> </a>
+            </div>
+            <ul class="dropdown-menu list-group" id="dropDownMenu" style="    padding: 0;">
+
+                <a onclick="changeRoute('contact')"
+                   style="display:none;color:black;">
+                    <li class="list-group-item">
+                        <i class="fas fa-envelope"></i> Contact
+                    </li>
+                </a>
+
+                <a onclick="setUserLoggedOut()" style="color:black;">
+                    <li class="list-group-item">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </li>
+                </a>
+                <a onclick="changeRoute('login')" style="color:black;">
+                    <li class="list-group-item">Connexion</li>
+                </a>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<div id="app"></div>
+
+<footer>
+    <div class="icon-container" id="footer-icons">
+        <div class="item-footer">
+            <i onclick="changeRoute('home')" class="redirect fas fa-home fa-2x"></i>
+            <span class="icon-label">Accueil</span>
+        </div>
+        <div class="item-footer">
+            <i onclick="changeRoute('links')" class="redirect fas fa-link fa-2x"></i>
+            <span class="icon-label">Liens</span>
+        </div>
+        <div class="item-footer">
+            <i onclick="changeRoute('profil')" class="redirect fas fa-user fa-2x"></i>
+            <span class="icon-label">Profil</span>
+        </div>
+        <div class="item-footer">
+            <i onclick="changeRoute('qrcode')" class="redirect fas fa-qrcode fa-2x"></i>
+            <span class="icon-label">Qrcode</span>
+        </div>
+    </div>
+</footer>
+
+<script src="cordova.js"></script>
+<script src="js/index.js"></script>
+</body>
+
+</html>

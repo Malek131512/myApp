@@ -1,0 +1,396 @@
+<?php
+$bipsSql = new bipsSql();
+$userSql = new userSql();
+$settingSql = new settingSql();
+
+if (isset($SessionManager) && $SessionManager->isLoggedIn()) {
+    $bips = $bipsSql->getBipsbyIduser((int)$SessionManager->get('idUserConnect'));
+    $user = $userSql->getUserbyId((int)$SessionManager->get('idUserConnect'));
+    if (is_array($bips))
+        $bips = $bips[0];
+
+    if (is_array($user))
+        $user = $user[0];
+}
+
+if (isset($SessionManager)) {
+    if (isset($user) && isset($bips)) {
+        if ($user instanceof user && $bips instanceof bips) {
+            $profilSql = new profilSql();
+
+            $profil = $profilSql->getProfilbyIduser((int)$user->getIduser(), 1);
+            if (is_array($profil) && !empty($profil)) $profil = $profil[0];
+
+            if (empty($profil)) {
+                $profil = new profil();
+                $profil->setCrypt($bips->getCrypt());
+                $profil->setIduser((int)$user->getIduser());
+                $profil->setIdprofil((int)1);
+                $profil = $profilSql->createProfil($profil);
+                if (is_array($profil) && !empty($profil)) $profil = $profil[0];
+            }
+
+            $linkSql = new linkSql();
+            if ($profil instanceof profil)
+                $links = $linkSql->getLinkByIduserAndIdprofil($user->getId(), 1);
+
+            foreach ($links as $link) {
+                if ($link instanceof link) {
+                    if ((int)$link->getEst_direct() == 1 && (int)$link->getEst_visible() == 1) {
+                        $links = array();
+                        $links[] = $link;
+                    }
+                }
+            }
+            $popupSql = new popupSql();
+            $popup = $popupSql->getPopupByIduser((int)$user->getIduser());
+            if (is_array($popup)) $popup = $popup[0];
+        }
+    }
+}
+if (isset($setting) && $setting instanceof setting) {
+    switch ((int)$setting->getNumberIcon()) {
+        case 1:
+            list($divIconWidth, $iconWidth) = array(200, 180);
+            break;
+        case 2:
+            list($divIconWidth, $iconWidth) = array(150, 140);
+            break;
+        case 3:
+            list($divIconWidth, $iconWidth) = array(105, 100);
+            break;
+    }
+}
+
+$displayStyle = 'none';
+$imageSrc = 'white.png';
+
+if (($profil instanceof profil && $profil->getPhoto() !== null) || (isset($SessionManager) && $SessionManager->isLoggedIn())) {
+    $displayStyle = 'initial';
+}
+
+if (isset($profil) && $profil instanceof profil && $profil->getPhoto() !== null) {
+    $imageSrc = 'profil/' . $profil->getPhoto();
+} elseif (isset($SessionManager) && $SessionManager->isLoggedIn()) {
+    $imageSrc = 'profil.jpg';
+}
+?>
+    <style>
+
+
+        .div-icon-style-list {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 18px;
+            margin: 15px auto;
+            width: 360px;
+            height: 100px;
+        }
+
+        .icon-style-list {
+            padding: 10px;
+            margin: 1vw;
+            border-radius: 12px;
+            border-color: transparent;
+            margin-bottom: auto;
+            width: 125px;
+            height: 125px;
+            margin-right: 15px; /* espace entre l'icône et le texte */
+            flex-shrink: 0; /* empêche l'icône de rétrécir */
+        }
+
+
+        .redirectLink {
+            width: 20px; /* définissez la taille souhaitée */
+            height: 20px;
+            border-radius: 50%; /* rend l'icône ronde */
+            margin-left: 15px; /* espace entre le texte et l'icône de redirection */
+            cursor: pointer; /* change le curseur en main lorsqu'il survole l'icône */
+        }
+
+        .linkNameList {
+            width: auto; /* Ou définissez une largeur fixe suffisamment grande pour accueillir 50 caractères */
+            text-align: left;
+            height: auto;
+            margin: 8px 3vw;
+            margin-top: -50px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: normal;
+            overflow: visible; /* Permet au texte de s'étendre */
+            /* Commentez ou supprimez la ligne suivante si vous voulez que tout le texte soit visible */
+            /* -webkit-line-clamp: 2; */
+            display: block; /* Changez à block au lieu de -webkit-box */
+            max-height: 55px; /* Hauteur maximale que vous souhaitez pour la description */
+            overflow: auto; /* Cache le texte qui dépasse */
+        }
+
+
+        .btnlistlink {
+            margin-top: -47px;
+            border-radius: 8px;
+            margin-right: 12px;
+            width: 60px;
+            height: 30px;
+            background: white;
+            filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.2));
+            transition: filter 0.3s ease-in-out;
+        }
+
+        .linkName {
+            width: 100px;
+            height: auto;
+            margin: 8px 1vw;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .div-icon-style-1 {
+            margin: 5px;
+            width: <?=$divIconWidth?>px;
+            height: auto;
+            display: inline-table;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .icon-style-1 {
+            margin: 1vw;
+            width: <?=$iconWidth?>px;
+            height: <?=$iconWidth?>px;
+            padding: 0;
+            border-radius: 12px;
+            border-color: transparent;
+            margin-bottom: auto;
+        }
+
+        .icon-style-2 {
+            margin: 10px;
+            width: 80px;
+            height: 80px;
+            padding: 0;
+            border-radius: 12px;
+            border-color: transparent;
+            margin-bottom: auto;
+        }
+
+        .text-ajust {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        #Links {
+            display: contents;
+        }
+
+        .container-profil {
+            margin-top: 80px;
+            width: auto;
+            max-width: 415px;
+            padding: 0;
+            padding-bottom: 30vw;
+            display: block;
+        }
+
+        .banniere-style {
+            border-radius: 20px;
+            width: 100%;
+            height: 200px;
+        }
+
+        #div-banniere {
+            width: 90%;
+            max-width: 800px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        #div-photo-profil {
+            margin-top: -60px;
+            min-height: 60px;
+        }
+
+        #image-photo-profil {
+            object-fit: cover;
+            object-position: center;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            box-shadow: 0px 0px 13px 2px rgb(0 0 0 / 37%);
+
+        }
+
+        #div-btn-lead {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #div-description-profil {
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            padding: 0;
+            border-radius: 12px;
+            border-color: transparent;
+            width: 360px;
+            height: 160px;
+            margin: 20px 0 90px 0;
+        }
+
+        #div-nom-prenom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+
+    <div class="container container-profil text-center">
+        <input type="hidden" id="crypt"
+               value="<?= (isset($bips) && $bips instanceof bips) ? $bips->getCrypt() : ''; ?>">
+        <input type="hidden" id="iduser"
+               value="<?= (isset($bips) && $bips instanceof bips) ? (int)$bips->getIduser() : ''; ?>">
+        <input type="hidden" id="idprofil"
+               value="<?= (isset($profil) && $profil instanceof profil) ? (int)$profil->getIdprofil() : ''; ?>">
+        <div id="div-banniere" style="<?= ($profil->getBanniere() !== null) ? 'display:block;' : 'height:80px;' ?>"
+             class="editProfilModal">
+            <img style="<?= ($profil->getBanniere() !== null) ? 'display:block;' : 'display:none;' ?>"
+                 src="<?= CommunUtils::getFolderName(__DIR__) ?>/img/couverture/<?= ($profil->getBanniere() !== null) ? $profil->getBanniere() : 'white.png' ?>"
+                 id="img-couverture" class="banniere-style"/>
+        </div>
+
+        <div id="div-photo-profil" class="editProfilModal">
+            <img class="image-photo-profil" id="img-photo-profil"
+                 style="display: <?= $displayStyle ?>;"
+                 src="<?= CommunUtils::getFolderName(__DIR__) ?>/img/<?= $imageSrc ?>">
+        </div>
+        <div id="div-nom-prenom">
+            <?php if (isset($SessionManager) && $SessionManager->isLoggedIn()) { ?>
+                <i class="fas fa-cog fa-2x EditInfosProfil" aria-hidden="true"></i>
+            <?php } ?>
+            <h4 style="margin:20px;"><?php echo $user->getNom() . " " . $user->getPrenom(); ?></h4>
+        </div>
+        <?php if (isset($SessionManager) && $SessionManager->isLoggedIn()) { ?>
+            <div id="div-lead_capture" class="form-group">
+                <label for="lead_capture" id="editLeadCapture" style="text-decoration: underline; color: black;">Capture de prospect
+                <i class="fas fa-users-viewfinder"
+                   style="display: <?= (isset($popup) && $popup instanceof popup && $popup->getActif() == 1) ? 'contents' : 'none' ?> ;"
+                   aria-hidden="true"></i></label>
+                <input type="checkbox"
+                       id="lead_capture" <?= (isset($popup) && $popup instanceof popup && $popup->getActif() == 1) ? 'checked="checked"' : '' ?>
+                       data-onstyle="success" data-offstyle="dark"
+                       data-on="Activé" data-off="Désactivé" data-toggle="toggle" data-style="ios">
+
+            </div>
+        <?php } ?>
+        <?php if (isset($profil) && $profil instanceof profil) { ?>
+            <span class="custom-button2" style="
+    color: #2f4f4f;
+    margin-top: 25px;
+    margin-left: 4px;
+    margin-bottom: 0px;
+    width: max-content;
+    padding: 5px 15px;
+    height: auto;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+    cursor: pointer;">
+                Bips : <b><?= $profil->getScore() ?></b>
+            </span>
+        <?php } ?>
+
+        <div id="div-ville-emploi"></div>
+        <?php if (isset($SessionManager) && $SessionManager->isLoggedIn()) { ?>
+            <div class="background-white" id="div-description-profil">
+                <div class="background-white" id="areaDescription">
+                    <?= $profil->getDescription() ?>
+                </div>
+                <script>
+                    // Initialise Quill Editor
+                    var quill = new Quill('#areaDescription', {
+                        theme: 'snow' // This loads the Snow UI theme
+                    });
+                </script>
+            </div>
+        <?php } else echo '<span style="display: block;margin: 5%;">' . $profil->getDescription() . '</span>'; ?>
+        <div id="Links">
+            <input class="form-control" type="hidden" id="idprofil" value="<?= (int)$profil->getIdprofil() ?>"/>
+            <?php
+
+            $iconSql = new iconSql();
+            $icon_customSql = new icon_customSql();
+            $profilSql = new profilSql();
+            foreach ($links
+
+                     as $link) {
+                if ($link instanceof link) {
+                    if ((int)$link->getEst_visible() == 1) {
+                        if ((int)$link->getEst_custom() == 1) {
+                            $icon_custom = $icon_customSql->getIconCustomById($link->idicon)[0];
+                        } else {
+                            $icon = $iconSql->getIconByIdicon($link->idicon)[0];
+                        }
+                        if (isset($icon) && $icon instanceof icon || $icon_custom instanceof icon_custom) {
+                            if ($setting instanceof setting && (int)$setting->getEstListe() == 0) {
+                                ?>
+                                <div class="div-icon-style-1 ">
+                                    <img src="<?= CommunUtils::getFolderName(__DIR__) ?>/img/<?= ((int)$link->getEst_custom() == 1) ? 'icon_custom/' . (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getPath_logo() : '') : (isset($icon) && $icon instanceof icon ? $icon->getLogo() : '') ?>"
+                                         class="icon-style-1 redirectLink <?php echo ($icon instanceof icon && (int)$icon->getLogo_forme() == 2) ? 'social-icon-auto' : 'social-icon'; ?>"
+                                         idlink="<?= $link->getIdlink() ?>"
+                                         est_custom="<?= (int)$link->getEst_custom() ?>"
+                                         est_direct="<?= (int)$link->getEst_direct() ?>"
+                                         idicon="<?= ((int)$link->getEst_custom() == 1) ? (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getIdicon_custom() : "") : (isset($icon) && $icon instanceof icon ? $icon->getIdicon() : '') ?>"/>
+                                    <p class="linkName text-center text-ajust"
+                                       style="width: <?= $iconWidth ?>;"><?= utf8_decode(((int)$link->getEst_custom() == 1) ? (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getLibelle() : '') : (isset($icon) && $icon instanceof icon ? $icon->getLibelle() : '')) ?></p>
+                                </div>
+                            <?php } else if ($setting instanceof setting && (int)$setting->getEstListe() == 1) { ?>
+                                <div class="div-icon-style-list">
+                                    <img src="<?= CommunUtils::getFolderName(__DIR__) ?>/img/<?= ((int)$link->getEst_custom() == 1) ? 'icon_custom/' . (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getPath_logo() : '') : (isset($icon) && $icon instanceof icon ? $icon->getLogo() : '') ?>"
+                                         class="icon-style-2 redirectLink <?php echo ($icon instanceof icon && (int)$icon->getLogo_forme() == 2) ? 'social-icon-auto' : 'social-icon'; ?>"
+                                         idlink="<?= $link->getIdlink() ?>"
+                                         est_custom="<?= (int)$link->getEst_custom() ?>"
+                                         est_direct="<?= (int)$link->getEst_direct() ?>"
+                                         idicon="<?= ((int)$link->getEst_custom() == 1) ? (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getIdicon_custom() : "") : (isset($icon) && $icon instanceof icon ? $icon->getIdicon() : '') ?>"/>
+
+                                    <div style="display:grid;     margin-top: 55px;   width: 200px;">
+                                        <p class="linkNameList"><?= utf8_encode(((int)$link->getEst_custom() == 1) ? (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getLibelle() : '') : (isset($icon) && $icon instanceof icon ? $icon->getLibelle() : '')) ?></p>
+                                        <br>
+                                        <?php if ($link instanceof link && $link->getDescription() !== null && $link->getDescription() !== "") { ?>
+                                            <p class="linkNameList"
+                                               style="font-weight:400;"><?= ($link instanceof link && $link->getDescription() !== null ? $link->getDescription() : "") ?></p>
+                                        <?php } ?>
+                                    </div>     <!-- Petite icône de redirection -->
+                                    <div class="btnlistlink redirectLink" idlink="<?= $link->getIdlink() ?>"
+                                         est_custom="<?= (int)$link->getEst_custom() ?>"
+                                         est_direct="<?= (int)$link->getEst_direct() ?>"
+                                         idicon="<?= ((int)$link->getEst_custom() == 1) ? (isset($icon_custom) && $icon_custom instanceof icon_custom ? $icon_custom->getIdicon_custom() : "") : (isset($icon) && $icon instanceof icon ? $icon->getIdicon() : '') ?>">
+                                    <span style="     margin-top: 6px;
+    margin-left: 2px;" class="fas fa-share-from-square ">
+                                     </span>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+        </div>
+
+    </div>
+<? if (isset($popup) && $popup instanceof popup && (int)$popup->getBouton() && isset($SessionManager) && !$SessionManager->isLoggedIn()) {
+    ?>
+    <div class="text-box">
+        <a href="#" id="manualOpenButton" class="btn-lead btn-white btn-animate block"><?= $popup->getText_bouton() ?></a href="#">
+    </div>
+<?php } ?>
+<?php

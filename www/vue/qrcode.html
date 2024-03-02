@@ -1,0 +1,224 @@
+<?php
+$bipsSql = new bipsSql();
+$userSql = new userSql();
+$settingSql = new settingSql();
+
+?>
+<script src="<?=CommunUtils::getFolderName(__DIR__)?>/js/QrCode.js"></script>
+<style>/* Style the buttons that are used to open and close the accordion panel */
+    .accordion {
+        background-color: #eee;
+        color: #444;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        outline: none;
+        transition: 0.4s;
+    }
+
+    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+    .active, .accordion:hover {
+        background-color: #ccc;
+    }
+
+    /* Style the accordion panel. Note: hidden by default */
+    .panel {
+        padding: 0 18px;
+        background-color: white;
+        display: none;
+        overflow: hidden;
+    }
+
+
+    #rowCopy {
+        padding: 15px;
+        max-width: 645px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    input#profileLink {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid white;
+        background-color: #343a40;
+        max-width: initial;
+        color: white;
+    }
+
+    .action-button {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid white;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        background-color: #343a40;
+        color: white;
+        cursor: pointer;
+        border-radius: 50px;
+        margin-right: 10px;
+    }
+
+
+    .action-button:active {
+        box-shadow: 0px 0px 13px 10px rgb(0 0 0 / 20%);
+        background-color: white;
+        color: black;
+        border-color: black;
+        border-radius: 30px;
+    }
+
+    .rotate-icon {
+        animation: rotation 0.6s ease-in-out;
+    }
+
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .qrCodeWrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    #vueQrcode {
+        width: 220px;
+        height: 220px;
+        padding: 0;
+        text-align: center;
+    }
+
+    .action-button-left, .action-button-right {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 55px;
+    }
+
+    .action-button-left {
+        left: 30px; /* Utilisation des 30px de bord transparent */
+    }
+
+    .action-button-right {
+        right: 30px; /* Utilisation des 30px de bord transparent */
+    }
+
+    @media (max-width: 360px) {
+        .action-button-left, .action-button-right {
+            width: 45px;
+            font-size: 1.5rem;
+        }
+    }
+    /* ... Votre CSS existant ... */
+
+    .qrCodeRow {
+        align-items: center;
+        position: relative;
+        margin: 3vh auto;
+        width: -webkit-fill-available;
+        justify-content: center;
+    }
+
+
+    .action-button {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%); }
+
+    .col-auto {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .rotate-icon {
+        transform: rotate(360deg);
+    }
+
+    .fa-check, .fa-copy {
+        transition: all 0.5s ease-in-out;
+    }
+
+    .fa-hidden {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    .icon {
+        transition: transform 0.5s ease;
+    }
+
+    .icon-hidden {
+        transform: scale(0);
+    }
+
+    .icon-check {
+        transform: scale(1) rotate(360deg);
+    }
+
+    @media (max-width: 279px) {
+        .horizontal-btn {
+            width: -webkit-fill-available;
+        }
+    }
+    #copyButton{
+        background: transparent;
+        border: 0;
+        color: white;
+    }
+</style>
+<body>
+<div class="container-fluid" style="margin: auto;      margin-top: 14vh;margin-bottom: 10rem;    padding: 0;">
+    <!--
+             <img id="image-icon-pro" class="image-icon-pro" style="
+            width: 55px;
+    position: absolute;
+    margin-left: 170px;
+    margin-top: 15px;" src="<?php CommunUtils::getFolderName(__DIR__) ?>/img/pro.png">
+        -->
+    <input type="hidden" id="crypt" value="<?= (isset($bips) && $bips instanceof bips) ? $bips->getCrypt() : '' ?>">
+    <div class="row align-items-center" id="rowCopy">
+        <div class="col-12" style="background-color: #343a40; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+            <input type="text" id="profileLink" value="<?=CommunUtils::getFolderName(__DIR__)?>/index.php?cry=<?= (isset($bips) && $bips instanceof bips) ? $bips->getCrypt() : '' ?>" style="border: none; color: white; background-color: transparent; flex-grow: 1; padding: 10px;">
+            <div style="border-left: 1px solid white; padding-left: 10px;">
+                <button id="copyButton" onclick="copyLink()">
+                    <i class="fas fa-copy fa-2x" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row qrCodeRow">
+        <div class="col-auto button-wrapper horizontal-btn" style="margin: auto;margin-right: 5%;">
+            <button class="action-button GenerateQrCode" id="customizeQRButton">
+                <i class="fas fa-qrcode fa-2x" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div id="vueQrcode" class="col-auto GenerateQrCode" style="padding: 0;"></div>
+        <div class="col-auto button-wrapper horizontal-btn" style="margin: auto;margin-left: 5%;">
+            <button class="action-button" id="shareButton" onclick="shareProfile()">
+                <i class="fas fa-share fa-2x" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+

@@ -1,0 +1,54 @@
+<style>
+    .grid-square {
+        width: 100%;
+        height: 145px;
+    }
+
+    .div-icon-style-1 {
+        margin: 5px;
+        width: 115px;
+        height: auto;
+        display: inline-table;
+    }
+
+    .icon-style-1 {
+        margin: 1vw;
+        width: 100px;
+        height: 100px;
+        padding: 0;
+        border-radius: 12px;
+        border-color: transparent;
+    }
+
+    .text-ajust {
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    #MesLiens {
+        display: contents;
+    }
+
+    .container-links {
+        overflow: auto;
+        margin: 11vh auto 7rem auto;
+        width: auto;
+        max-width: 415px;
+        padding: 0;
+    }
+</style>
+<div class="container container-links text-center">
+    <div class="div-icon-style-1 non-draggable-icon" style="">
+        <img src="https://bip-me.fr/bip/img/add-reseau.jpg"
+             class="grid-square icon-style-1 social-icon" id="createIcon"
+        />
+        <p class="text-center text-ajust">Créer un lien</p>
+    </div>
+    <div id="MesLiens">
+        <input class="form-control" type="hidden" id="idprofil" value="1"/>
+        <input class="form-control" type="hidden" id="profil_est_direct" value="0"/>
+
+
+    </div>
+</div>
+

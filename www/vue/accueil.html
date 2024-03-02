@@ -1,0 +1,297 @@
+<--!
+<?php
+$bipsSql = new bipsSql();
+$userSql = new userSql();
+$settingSql = new settingSql();
+
+if (isset($SessionManager) && $SessionManager->isLoggedIn()) {
+    $bips = $bipsSql->getBipsbyIduser((int)$SessionManager->get('idUserConnect'));
+    $user = $userSql->getUserbyId((int)$SessionManager->get('idUserConnect'));
+    if (is_array($bips))
+        $bips = $bips[0];
+
+    if (is_array($user))
+        $user = $user[0];
+}
+$prospectSql = new prospectSql();
+$linkSql = new linkSql();
+$iconSql = new iconSql();
+$icon_customSql = new icon_customSql();
+$popupSql = new popupSql();
+$popup = $popupSql->getPopupByIduser((int)$user->getIduser());
+if (is_array($popup)) $popup = $popup[0];
+
+$prospects = $prospectSql->getProspectByCrypt($bips->getCrypt());
+function getPathNameLink($idlink)
+{
+    $linkSql = new linkSql();
+    $iconSql = new iconSql();
+    $icon_customSql = new icon_customSql();
+    $link = $linkSql->getLinkById((int)$idlink);
+    if (isset($link[0])) $link = $link[0];
+    $path = false;
+    $name = false;
+    if ($link instanceof link) {
+        $name = $link->getLibelle();
+        if ((int)$link->getEst_custom()) {
+            $icon_custom = $icon_customSql->getIconCustomById((int)$link->getIdicon());
+            if (isset($icon_custom[0])) $icon_custom = $icon_custom[0];
+            if ($icon_custom instanceof icon_custom) {
+                $path = '/icon_custom/' . $icon_custom->getPath_logo();
+            }
+        } else {
+            $icon = $iconSql->getIconByIdicon((int)$link->getIdicon());
+            if (isset($icon[0])) $icon = $icon[0];
+            if ($icon instanceof icon) {
+                $path = $icon->getLogo();
+            }
+        }
+    } else {
+        $icon = $iconSql->getIconByIdicon((int)$idlink);
+        if (isset($icon[0])) $icon = $icon[0];
+        if ($icon instanceof icon) {
+            $name = $icon->getLibelle();
+            $path = $icon->getLogo();
+        }
+    }
+    return array("path" => $path, "name" => $name);
+}
+
+$iconCount = array();
+$allUniqueClicks = array();            // Création d'un tableau vide pour stocker tous les clics uniques
+foreach ($prospects as $i => $prospect) {            // Parcourir tous les prospects
+    if ($prospect instanceof prospect && $prospect->getClick() !== "" && $prospect->getClick() !== null) {
+        $uniqueClicksForCurrentProspect = array_unique(explode(',', $prospect->getClick()));                    // Récupération des clics du prospect actuel et suppression des duplicatas
+        $allUniqueClicks = array_merge($allUniqueClicks, $uniqueClicksForCurrentProspect);                    // Ajout des clics uniques au tableau global
+    }
+}
+$clickCount = array_count_values($allUniqueClicks);            // Comptage du total des clics uniques
+arsort($clickCount);  // Trier le tableau en place
+?> !-->
+<style>
+    .count-highlight {
+        font-size: 24px;
+        color: #ff4500;
+        font-weight: bold;
+    }
+
+    .background-white {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+        padding: 20px;
+    }
+
+    .form-lead-return {
+        width: 100%;
+        padding: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .form-lead-return:hover {
+        background-color: #f9f9f9;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .div-form-lead {
+        align-items: center;
+        display: contents;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .icon-wrapper {
+        flex: 0 0 auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        height: 140px;
+        margin: 5px;
+        text-align: center;
+        width: 100px; /* Fixe la largeur */
+    }
+
+    .icon-wrapper p {
+        margin: 5px 0;
+        white-space: nowrap; /* Empêche les retours à la ligne */
+        overflow: hidden; /* Cache le texte qui déborde */
+        text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+        width: 100%; /* Utilise toute la largeur disponible */
+        overflow-wrap: break-word; /* Casse les mots trop longs pour éviter le débordement */
+    }
+
+    .icon-wrapper img {
+        border-radius: 20%;
+        width: 60px;
+        height: 60px;
+    }
+
+    #iconProspectClick {
+        margin-top: 7px;
+        width: 100%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .scroll-wrapper {
+        width: 100%;
+        display: flex;
+        height: 167px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    .justify-content-between {
+        display: contents;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .id-prospect, .timestamp {
+        display: inline-block;
+    }
+
+    .id-prospect {
+        height: 35px;
+        width: 80px;
+        text-align: left;
+        border: 1px solid black;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+    }
+
+    .timestamp {
+        margin-left: auto;
+        width: auto;
+        text-align: right;
+    }
+
+
+    .field-name {
+        text-align: left;
+    }
+
+    .file-input {
+        text-align: right;
+    }
+
+
+</style>
+<div class="container-fluid" style="    min-height: 60rem;">
+    <input type="hidden" id="crypt" value="<?= $bips->getCrypt() ?>">
+
+    <figure class="highcharts-figure" style="  margin: auto;  height: 400px;margin-top: 80px;border-radius: 30px;">
+        <div id="container"></div>
+    </figure>
+    <? if (count($clickCount) > 0) { ?>
+        <div class="background-white">
+            <h5>Les icônes les plus cliquées</h5>
+            <div class="scroll-wrapper">
+                <?php
+                foreach ($clickCount as $idlink => $count) {
+                    $pathName = getPathNameLink($idlink);
+                    $path = $pathName['path'];
+                    $name = $pathName['name'];
+                    if ($name && $path) { ?>
+                        <div class="icon-wrapper">
+                        <img src="<?= CommunUtils::getFolderName(__DIR__) . '/img/' . $path ?>" alt="<?= $name ?>"
+                             style="border-radius: 20%; width: 60px; height: 60px;">
+                        <p class="mt-1 text-center"><?= $name ?></p>
+                        <p class="mt-1 text-center"
+                           style="font-weight:<?= $weight = empty($weight) ? 800 : $weight - 100 ?>;"><?= $count ?></p>
+                        </div><?php
+                    }
+                }
+                unset($weight);
+                ?>
+            </div>
+        </div>
+    <? } ?>
+
+    <?php if (!empty($prospects)) { ?>
+        <div class="container">
+        <br>
+        <h5 style="text-align: center;">Mes Prospects</h5>
+        <?php foreach ($prospects as $index => $prospect) { ?>
+                <?php if ($prospect instanceof prospect) { ?>
+                    <div class="background-white">
+                        <div class="row justify-content-between">
+                            <div class="id-prospect">#<?= (string)$prospect->getNumeroProspect() ?></div>
+                            <?php if (!empty($prospect->getTimestamp())) { ?>
+                                <div class="timestamp"><?= strftime("%e %B %Y %H:%M", $prospect->getTimestamp()) ?></div>
+                            <?php } else { ?>
+                                <div class="timestamp"></div>
+                            <?php } ?>
+                        </div>
+                        <?php
+                        $values = array($prospect->getNom(), $prospect->getPrenom(), $prospect->getEmail(), $prospect->getTel(), $prospect->getMessage());
+                        $filtered_values = array_filter($values, function ($value) {
+                            return !is_null($value);
+                        });
+                        ?>
+
+                        <?php if (!empty($filtered_values)) { ?>
+                            <div class="form-lead-return">
+                                <?php
+
+                                foreach ($values as $i => $value) {
+                                    if (isset($value) && !empty($value)) {
+                                        if ($popup instanceof popup) {
+                                            $fields = ['nom', 'prenom', 'email', 'tel', 'message'];
+                                            $field = 'get' . ucfirst($fields[$i]);
+                                            ?>
+                                            <div class="row">
+                                                <p class="col-5 field-name"><?= (string)$popup->$field() ?></p>
+                                                <input type="text" class="col-6 file-input form-control"
+                                                       value="<?= $value ?>">
+                                            </div>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
+                        <?php if ($prospect->getClick() !== "" && $prospect->getClick() !== null) {
+                            $Click = array_unique(explode(',', $prospect->getClick()));
+                            if (!empty($Click)) { ?>
+                                <div id="iconProspectClick">
+                                    <?php
+                                    $i = 0;
+                                    $iconPathName = array();
+                                    foreach ($Click as $idlink) {
+                                        $pathName = getPathNameLink($idlink);
+                                        if ($pathName['path'] && $pathName['name']) {
+                                            $iconPathName[] = $pathName;
+                                        }
+                                    }
+                                    if (count($iconPathName) > 0) { ?>
+                                        <h5>Icônes cliquées</h5>
+                                        <div class="scroll-wrapper">
+                                            <?php foreach ($iconPathName as $pathName) {
+                                                $path = $pathName['path'];
+                                                $name = $pathName['name']; ?>
+                                                <div class="icon-wrapper">
+                                                    <img src="<?= CommunUtils::getFolderName(__DIR__) . '/img/' . $path ?>"
+                                                         alt="<?= $name ?>"
+                                                         style="border-radius: 20%; width: 60px; height: 60px;">
+                                                    <p class="mt-1 text-center"><?= $name ?></p>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                    <?php if (count($iconPathName) > 0) { ?>
+                                        <p style="text-align: center; width: 100%;">Total des clics :<b> <?= count($iconPathName) ?></b>
+                                        </p>
+                                    <?php } ?>
+                                </div>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+         <?php } ?>
+        </div>
+    <?php } ?>
+</div>
+

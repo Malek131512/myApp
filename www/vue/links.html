@@ -1,0 +1,307 @@
+/*
+<?php
+$bipsSql = new bipsSql();
+$userSql = new userSql();
+
+if (isset($SessionManager) && $SessionManager->isLoggedIn()) {
+    $bips = $bipsSql->getBipsbyIduser((int)$SessionManager->get('idUserConnect'));
+    $user = $userSql->getUserbyId((int)$SessionManager->get('idUserConnect'));
+    if (is_array($bips))
+        $bips = $bips[0];
+
+    if (is_array($user))
+        $user = $user[0];
+}
+
+if (isset($SessionManager)) {
+    if (isset($user) && isset($bips)) {
+        if ($user instanceof user && $bips instanceof bips) {
+            $profilSql = new profilSql();
+            $profil = $profilSql->getProfilbyIduser((int)$user->getIduser());
+            if (is_array($profil) && !empty($profil)) $profil = $profil[0];
+            if (empty($profil)) {
+                $profil = new profil();
+                $profil->setCrypt($bips->getCrypt());
+                $profil->setIduser((int)$user->getIduser());
+                $profil->setIdprofil((int)1);
+                $profil = $profilSql->createProfil($profil);
+                if (is_array($profil) && !empty($profil)) $profil = $profil[0];
+            }
+
+            $linkSql = new linkSql();
+            if ($profil instanceof profil)
+                $links = $linkSql->getLinkByIduserAndIdprofil($user->getId(), 1);
+
+            $profilDirect = false;
+            if (is_array($links) && count($links) > 0) {
+                foreach ($links as $link) {
+                    if ($link instanceof link) {
+                        if ((int)$link->getEst_direct()) {
+                            $profilDirect = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+?>
+*/
+<style>
+    .grid-square {
+        width: 100%;
+        height: 145px;
+    }
+    .div-icon-style-1 {
+        margin: 5px;
+        width: 115px;
+        height: auto;
+        display: inline-table;
+    }
+
+    .icon-style-1 {
+        margin: 1vw;
+        width: 100px;
+        height: 100px;
+        padding: 0;
+        border-radius: 12px;
+        border-color: transparent;
+    }
+
+    .text-ajust {
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    #MesLiens {
+        display: contents;
+    }
+
+    .container-links {
+        overflow: auto;
+        margin: 11vh auto 7rem auto;
+        width: auto;
+        max-width: 415px;
+        padding: 0;
+    }
+</style>
+<div class="container container-links text-center">
+    <div class="div-icon-style-1 non-draggable-icon" style="{profilDirect) ? 'display:none' : ''">
+        <img src="<?= CommunUtils::getFolderName(__DIR__) ?>/img/add-reseau.jpg"
+             class="grid-square icon-style-1 social-icon" id="createIcon"
+        />
+        <p class="text-center text-ajust">Créer un lien</p>
+    </div>
+    <div id="MesLiens">
+        <input class="form-control" type="hidden" id="idprofil" value="<?= (int)$profil->getIdprofil() ?>"/>
+        <input class="form-control" type="hidden" id="profil_est_direct" value="<?= ($profilDirect)?1:0 ?>"/>
+
+
+    </div>
+</div>
+<?php
+
+/*
+if (isset($_REQUEST['cry'])) {
+    $ListeFiche = new ListeFiche($_SESSION['idUserConnect'], $_REQUEST['cry']);
+} else {
+    $ListeFiche = new ListeFiche($_SESSION['idUserConnect']);
+
+}
+$Prospect = new prospect($_REQUEST['cry']);
+$Prospect->GetListeProspect();
+
+
+$Profils = array();
+foreach ($ListeFiche->ListeFiche as $key => $arrayRow) {
+    $Profils[$arrayRow['NUMFICHE']] = $arrayRow;
+}
+
+?>
+
+<div class="alert alert-success alert-dismissible fade show collapse hide" role="alert"
+     id="adresseEmailValider" <?php echo ($emailvalider == true) ? 'display:none;' : 'display:contents;'; ?>
+     style="<?php echo ($emailvalider == true) ? 'display:;' : 'display:none;'; ?>"
+     style="position: absolute;margin-top: 4rem;width:100%;">
+    Votre Adresse email à été valider&nbsp;!
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<?php
+
+foreach ($Fiche->InfosFiche as $InfosFiche) {
+    if ((int)$InfosFiche['IDRESEAU_INFOSFICHE'] == 3) {
+        $email = isset($InfosFiche['LIBELLE']) ? $InfosFiche['LIBELLE'] : $user->email;
+        $emailHidden = $InfosFiche['HIDDEN'];
+    } else if ((int)$InfosFiche['IDRESEAU_INFOSFICHE'] == 4) {
+        $tel = isset($InfosFiche['LIBELLE']) ? $InfosFiche['LIBELLE'] : $user->tel;
+        $telHidden = $InfosFiche['HIDDEN'];
+    }
+} ?>
+
+
+<hr class="my-4">
+<div class="container-fluid" style="width:420px;display: inline-block">
+    <input id="methode" name="methode" type="hidden" value="modifier">
+
+    <input id="Fiche_id" name="Fiche_id" type="hidden" value="<?php echo $Fiche->NumFiche; ?>">
+    <input id="user_id" name="user_id" type="hidden" value="<?php echo $user->id; ?>">
+    <input id="user_nom" name="user_NOM" type="hidden" value="<?php echo $user->nom; ?>">
+    <input id="user_prenom" name="user_PRENOM" type="hidden" value="<?php echo $user->prenom; ?>">
+    <input id="user_email" name="user_EMAIL" type="hidden" value="<?php echo $user->email; ?>">
+    <input id="user_tel" name="user_TEL" type="hidden" value="<?php echo $user->tel; ?>">
+
+    <ul id="sortableEdit" style="width:406px;position:static;margin-left: auto;    margin-right: auto;">
+        <?php
+        // <ul id="sortable" style="width: auto;position: static;">
+        foreach ($Fiche->InfosFiche as $Row) {
+            foreach ($Row as $key => $contain) {
+                if ($key == "RESEAU") {
+                    $RESEAU = $contain;
+                }
+                if ($key == "LIBELLE") {
+                    $LIBELLE = $contain;
+                }
+                if ($key == "HIDDEN") {
+                    $HIDDEN = $contain;
+                }
+                if ($key == "URL") {
+                    $URL = (int)$contain;
+                }
+                if ($key == "PRE_URL") {
+                    $PREURL = ($contain != null) ? $contain : 0;
+                    $est_preurl = ($contain != null) ? 1 : 0;
+                }
+                if ($key == "LOGO") {
+                    $LOGO = $contain;
+                }
+                if ($key == "TOOLTIP") {
+                    $tooltip = $contain;
+                }
+                if ($key == "IDRESEAU_INFOSFICHE") {
+                    $IDRESEAU = $contain;
+                }
+                if ($key == "PATH") {
+                    $PATH = ((int)$IDRESEAU > 500) ? '/bip/IconesReseauPerso/' . $contain : '/bip/img/' . $contain;
+                }
+            }
+
+
+            if (($RESEAU != "NOM") && ($RESEAU != "PRENOM") && ($RESEAU != "EMAIL") && ($RESEAU != "TEL")) {
+
+                ?>
+                <li class="ui-state-default">
+                    <div id="all<?php echo $IDRESEAU; ?>" style="display:grid;max-width: 230px;">
+                        <div id="logo-img" class="" style="margin: 0; height: 150px;   width: 190px;">
+                            <div id="icon-reseau" class="" style="    margin: 0;display:grid;">
+                                <div style="font-size: 2.5rem;margin-top: 22%;">
+                                    <i data-idreseau="<?php echo $IDRESEAU; ?>"
+                                       value="<?php echo $HIDDEN; ?>"
+                                       class="fa fa-eye<?php echo ((int)$HIDDEN == 0) ? '-slash' : ''; ?> eyesHidden">
+                                    </i>
+                                </div>
+                                <div value="<?php echo $IDRESEAU; ?>" id="trash-ns-<?php echo $IDRESEAU; ?>"
+                                     class="Savetrash" data-preurl="<?php echo $PREURL; ?>"
+                                     data-reseau="<?php echo $RESEAU ?>"
+                                     data-idreseau="<?php echo $IDRESEAU; ?>"
+                                     style="font-size: 2rem;margin-top: 22%;">
+                                    <i class="fa fa-trash"></i>
+                                </div>
+                            </div>
+
+                            <div id="input" class="" style="display:grid;">
+                                <img id="image-icon-reseau-<?php echo $IDRESEAU; ?>" class="image-icon-reseau
+" style="    object-fit: contain;object-position: center;margin-right: 0px;"
+                                     src="<?php echo $PATH; ?>"/>
+                                <h3 style=" font-size: 20px; "><?php echo $RESEAU; ?></h3>
+                                <div class="row-lg-8">
+
+                                    <i class="fas fa-question-circle"
+                                       style="font-size: 20px;margin-top: 10px;margin-right: 10px;"
+                                       data-toggle="tooltip" data-placement="top"
+                                       title="<?php echo $tooltip; ?>"></i>
+                                    <input type="text" class="form-control inputReseau" value="<?php echo $LIBELLE; ?>"
+                                           name="<?php echo $IDRESEAU; ?>_NU" data-idreseau="<?php echo $IDRESEAU; ?>"
+                                           data-hidden="<?php echo $HIDDEN; ?>"
+                                           style="min-width: 160px;margin-right: 50px;    width: 100%;margin-bottom: 2%;"
+                                           placeholder="<?php echo ((int)$est_preurl == 0) ? 'Lien ' : 'Nom d\'utilisateur ';
+                                           echo $RESEAU; ?>">
+                                </div>
+                            </div>
+                        </div>
+                </li>
+                <?php
+                // echo '</li>';
+            }
+
+
+            unset($issetURL);
+        }
+        ?>
+    </ul>
+    <?php
+    if ((int)$Fiche->est_fiche_unique == 0) {
+        echo '<script> $("#jumbotron-unique").hide();</script>';
+    } else if ((int)$Fiche->est_fiche_unique == 1) {
+        echo '<script> $("#jumbotron-multiple").hide(); </script>';
+        echo '<script> $("#jumbotron-unique").show(); </script>';
+
+    }
+
+    echo '</div>';
+
+    ?>
+    <div class="container-fluid" style="position: absolute;margin-top: 80px;">
+        <?php if (count($ListeFiche->ListeFiche) < 1) { ?>
+            <?php $idFiche = 1; ?>
+            <div class="row" style="margin-left:auto;display: grid;margin-right:auto;width: MAX-CONTENT;">
+                <h3 style="margin: auto;">Bienvenue !</h3>
+                <br>
+                <p style="font-size: 17px;">C'est le moment de créer votre premier profil !</p>
+            </div>
+            <div class="row" style="    margin-left: auto;    margin-right: auto;">
+                <div id="SortableListe" class="row" style="padding:40px;    padding-top: 0;">
+                    <div class="grid-square" style="background-color: #333333;color:white;text-align: center;
+    border-radius: 11px;        margin: 0;
+    margin-bottom: 200px;
+    color: white;
+
+    box-shadow: 0px 0px 13px 3px rgb(0 0 0 / 20%);"
+                         href="index.php?i=2&profil=<?php echo $idProfil; ?>&cry=<?php echo $user->cryptVal; ?>">
+                        <a class=""
+                           href="/bip/index.php?i=2&profil=<?php echo $ListeFiche->NewNumFiche; ?>&cry=<?php echo $ListeFiche->crypt; ?>">
+                            <i style="    font-size: 80px;
+    color: white;
+" class="fa fa-plus"></i>
+                            <p style="font-size: 25px;
+    color: white;"> Créer un profil</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php } else { ?>
+        <div class="row" style="width: initial;">
+            <input id="user_id" name="user_id" type="hidden" value="<?php echo $user->id; ?>">
+            <input id="crypt" name="crypt" type="hidden" value="<?php echo $ListeFiche->crypt; ?>">
+
+            <div id="SortableListe" style="    padding-top: 0; margin-left: auto;
+    margin-right: auto;
+    width: 400px;    text-align: center;">
+    </div>
+
+
+<?php
+require_once dirname(__DIR__) . "/inc/Footer.php";
+
+require dirname(__DIR__) . "/Modal/Modal-supprimer-fiche.php";
+require dirname(__DIR__) . "/Modal/Modal-supprimer-input.php";
+require dirname(__DIR__) . "/Modal/CreeReseauPerso.php";
+require dirname(__DIR__) . '/Modal/ajouter-un-reseau.php';
+require dirname(__DIR__) . '/Modal/editer-photo-profil.php';
+require dirname(__DIR__) . '/Modal/editer-un-reseau.php';
+require dirname(__DIR__) . '/Modal/ajouter-un-reseau_1.php';
+
+
+?>*/

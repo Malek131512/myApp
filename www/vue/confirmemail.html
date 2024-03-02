@@ -1,0 +1,47 @@
+<?php
+require_once dirname(__DIR__) . '/classes/autoLoader.php';
+$SessionManager = new SessionManager();
+if (isset($_REQUEST['email']) && isset($_REQUEST['jt'])) {
+    $userSql = new userSql();
+    $user = $userSql->getUserbyEmailJeton((int)$_REQUEST['jt'])[0];
+    if ($user instanceof user) {
+            $userUpdate = new user();
+            $userUpdate->setIduser($user->getId());
+            $userUpdate->setEmail_edit('');
+            $userUpdate->setEmail($user->getEmail_edit());
+            $userUpdate->setEmail_est_valide(true);
+            $userSql->updateUser($userUpdate);
+                if (!$SessionManager->isLoggedIn()) {
+                    $SessionManager->set('idUserConnect', $user->getIduser());
+                    unset($_SESSION['PreIdUserConnect']);
+                }
+                $name = constant(CommunUtils::get_constant_name($SessionManager->getController()) . '_NAME');
+            $SessionManager->setController(PAGE_LIENS);
+        echo '<script>window.location.replace("' . CommunUtils::getFolderName(__DIR__) . '/index.php?links");</script>';
+    }
+
+}
+    if ($SessionManager->get('PreIdUserConnect') !== null) {
+        ?>
+        <div class="jumbotron"
+             style="      background-color: #f7f9fb;  margin-top: 10rem;  text-align: center;   margin-bottom: 15rem;height: 500px;    width: min-content;margin-left:auto;margin-right:auto;">
+            <h4 class="alert-heading">Vous y êtes presque !</h4>
+            <br>
+            <div class="alert alert-success" role="alert">
+                    Un e-mail de confirmation a été envoyé à
+                    l'adresse e-mail suivante :
+                <br>
+                    <b><?= (isset($user) && $user instanceof user) ? $user->getEmail() : ''; ?>
+                    </b>
+                <br>
+                Veuillez cliquer sur le lien dans l'e-mail pour valider votre compte.
+            </div>
+            <div id="alert_message" style="position: unset;    width: 275px;">
+                <button class="btn-dark custom-button btn_flip1" style="    width: 160px;
+    font-size: 18px;margin-top: 15px;" onClick="location.reload();">
+                    Actualiser &nbsp; <i class="fa fa-refresh"></i>
+                </button>
+            </div>
+        </div>
+    <?php }
+

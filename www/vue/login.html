@@ -1,0 +1,91 @@
+<div style="height: max-content;width:100%; top: -5rem;">
+    <div class="alert hide alert-danger alert-dismissible fade show collapse" role="alert" id="alertIndex"
+         style="display:none;text-align: center;width: 85%;position: relative;left: 50%;transform: translateX(-50%);top: 150px;">
+        <span id="errorText"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="alert success alert-success alert-dismissible fade show collapse" role="alert" style="display: none;"
+         id="alertMdpOublierEmail" style="width: 85%;margin: auto;margin-top: 13px;"><span id="text-alert"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+    </div>
+    <div id="connexionWithPassword" class="jumbotron"
+         style="     padding: 0;    margin-top: 10rem; background-color: #fbfdff; text-align: center;   margin-bottom: 15rem;height: 500px;   border-radius: 1.3rem; width: 19rem;margin-left:auto;margin-right:auto;">
+        <div class="row" style="    padding: 2vh;  padding-top: 0;">
+            <div class="inscription-info col" style=" padding: 0; "><p
+                    style=" text-align: center; padding: 0 10px; height: 34px; font-size: 12px; font-weight: 600; margin-top: 12px; ">
+                Vous n'êtes pas encore inscrit ? </p>
+                <hr style="border-color: black;">
+            </div> <!-- controller="<?php PAGE_INSCRIPTION ?>" class="redirect-->
+            <button class="btn-dark custom-btn col btnConnexionWithBip"
+                    style="border-color: black; font-size: 15px;    border-radius: 0; border-top-right-radius: 20px; height: 64px;margin: 0;top: 0; right: 0; width: 50%; border-top-left-radius: 0;">
+                Inscrivez-vous dès maintenant !
+            </button>
+        </div>
+        <div class="container"
+             style="    width: 255px; padding: 10px; border-radius: 20px;border: solid 1px #8f8c8c21; box-shadow: 0px 0px 12px 1px rgb(0 0 0 / 8%) ">
+            <p class="title-block">Connexion</p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button id="authorize_button" onclick="handleAuthClick()"
+                        class="btn btn-outline-light d-flex align-items-center gap-2 google-login-btn"><img
+                        src="https://www.svgrepo.com/show/475656/google-color.svg" width="24" height="24"
+                        alt="google logo" loading="lazy"> <span
+                        style="color: #343a40!important;">Connexion avec Google</span></button>
+            </div>
+            <div>
+                <div class="row"><span class="far fa-user" style="width: 13%; margin-top: 20px;"></span> <input
+                        type="email" name="email" id="formEmail" autocomplete="off"
+                        style="border-radius: 10px;width: 80%;" class="form-control-plaintext black-placeholder"
+                        placeholder="Adresse email" required="required"
+                        pattern="^[_a-zA-Z0-9\-]+(\.[_a-zA-Z0-9\-]+)*@([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,4}$"/></div>
+                <div class="row"><span class="fas fa-key" style="width: 13%; margin-top: 20px;"></span> <input
+                        type="password" name="password" autocomplete="false" style="border-radius: 10px;width: 80%;"
+                        id="formPassword" class="form-control-plaintext black-placeholder" placeholder="Mot de passe"
+                        reqired minlength="7"/></div>
+            </div>
+            <button class=" btn-dark custom-btn" style="     margin-left: 7px; width: 65%;" id="btnSubmitConnexion">
+                Confirmer
+            </button>
+            <a id="MdpOublie" style="    color: #007eff;">
+                <div class="text-center fs-6 underline-on-hover" style="margin-top:20px;">Mot de passe oublié ?</div>
+            </a></div>
+    </div>
+    <div class="jumbotron myJumbotron" id="connexionWithBip"
+         style="margin: 10rem auto 10rem auto; display: block;    margin-bottom: 15px; height: 500px;">
+        <button class="btn-dark custom-btn btnConnexionWithPassword"
+                style="background-color: #333;width:  -webkit-fill-available;    margin: 0;margin-bottom: 15px;"><span
+                class="fa fa-arrow-left" aria-hidden="true"></span> Retour
+        </button>
+        <div class="myToggleSection">
+            <button id="haveBipBtn" class="myToggleBtn">J'ai déjà un Bip</button>
+            <button id="noBipBtn"  onclick="changeRoute('signin')" class="myToggleBtn">Je n'ai pas de Bip</button>
+        </div>
+        <div class="myFormSection" id="formSection" style="margin-top: 15px;"><p class="title-block">Entrez le code
+            d'activation de votre bip.</p>
+            <div class="form-field d-flex align-items-center"><span class="fa fa-code" aria-hidden="true"></span> <input
+                    type="text" name="bip_id" id="bip_id" class="form-control" placeholder="AB12345" required></div>
+            <button class="btn-dark custom-btn" id="btnConfirmConnexionWithBip"
+                    style="width: 100%;margin: 0; margin-top: 15px;"><span class="fa fa-check"
+                                                                           aria-hidden="true"></span> Confirmer
+            </button>
+        </div>
+    </div>
+    <div class="jumbotron" id="MotDePasseOublier"
+         style="display:none;      background-color: #f7f9fb;  margin-top: 5rem;     text-align: center;   margin-bottom: 15rem;height: 500px;    width: 19rem;margin-left:auto;margin-right:auto;margin-top: 10rem;">
+        <p class="title-block">Entrez votre adresse email pour réinitialiser votre mot de passe.</p>
+        <div class="form-field d-flex align-items-center"><span class="far fa-mail"></span> <input type="email"
+                                                                                                   name="emailMdpOublie"
+                                                                                                   id="formEmailMdpOublie"
+                                                                                                   class="form-control"
+                                                                                                   style="    border-radius: 10px;margin-bottom: 1%;"
+                                                                                                   placeholder="Email"/>
+        </div>
+        <p class="text-success" id="text-success-mdp-oublie"></p>
+        <p class="text-danger" id="text-error-mdp-oublie"></p>
+        <button id="btnConfirmerMotDePasseOublier" class="btn-dark custom-btn">Confirmer</button>
+        <button class="btnConnexionWithPassword btn-dark custom-btn "><span class="fa fa-arrow-left"
+                                                                            aria-hidden="true"></span> Retour
+        </button>
+    </div>
+</div>
